@@ -7,45 +7,95 @@ generator client {
   provider = "prisma-client-js"
 }
 
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum OrderStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
+}
+
+enum Currency {
+  BTC
+  ETH
+  USDT
+  GHS
+  USD
+}
+
+enum TransactionType {
+  DEPOSIT
+  WITHDRAWAL
+}
+
 model User {
-  id                  String         @id @default(auto()) @map("_id") @db.ObjectId
-  email               String         @unique
-  password            String
-  name                String
-  phone               String?
-  role                String         @default("user") // "user" or "admin"
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  email    String  @unique
+  password String
+  name     String
+  phone    String?
+  role     String  @default("user")
 
   // Wallet balances
-  localWallet         Float          @default(0)      // Local currency (e.g., GHS)
-  usdWallet           Float          @default(0)      // USD equivalent
-  btcWallet           Float          @default(0)      // BTC balance
-  ethWallet           Float          @default(0)      // ETH balance
+  localWallet Float @default(0) // GHS wallet
+  usdWallet   Float @default(0) // USD equivalent
+  btcWallet   Float @default(0) // BTC balance
+  ethWallet   Float @default(0) // ETH balance
 
-  // Relations to transactions where the user is either the buyer or seller
-  buyerTransactions   Transaction[]  @relation("Buyer")
-  sellerTransactions  Transaction[]  @relation("Seller")
+  // Transactions: Deposits to the platform
+  transactions Transaction[]
 
-  createdAt           DateTime       @default(now())
-  updatedAt           DateTime       @default(now())
+  // Orders: Buying & Selling crypto
+  buyerOrders  Order[] @relation("Buyer")
+  sellerOrders Order[] @relation("Seller")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("users")
 }
 
 model Transaction {
-  id             String   @id @default(auto()) @map("_id") @db.ObjectId
-  buyerId        String   @db.ObjectId         // The user buying crypto
-  sellerId       String   @db.ObjectId         // The user selling crypto
+  id             String            @id @map("_id") @db.ObjectId
+  userId         String            @db.ObjectId
+  type           TransactionType // DEPOSIT or WITHDRAWAL
+  currency       String            @default("GHS") // Always in GHS
+  amount         Float
+  status         TransactionStatus @default(PENDING)
+  transactionRef String?           @unique // Paystack or internal ref
+  provider       String // "Paystack", "MobileMoney", etc.
 
-  currency       String   // e.g., "BTC", "ETH"
-  amountCrypto   Float    // Amount of cryptocurrency being traded
-  amountLocal    Float    // Local currency amount (e.g., GHS)
-  status         String   @default("PENDING") // e.g., "PENDING", "COMPLETED", "CANCELLED"
-  transactionRef String?  @unique             // Optional internal reference for tracking
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  createdAt      DateTime @default(now())
+  user User @relation(fields: [userId], references: [id])
 
-  buyer          User     @relation("Buyer", fields: [buyerId], references: [id])
-  seller         User     @relation("Seller", fields: [sellerId], references: [id])
-
+  @@index([userId])
+  @@index([status])
   @@map("transactions")
+}
+
+model Order {
+  id           String      @id @default(auto()) @map("_id") @db.ObjectId
+  buyerId      String      @db.ObjectId
+  sellerId     String      @db.ObjectId
+  currency     Currency // BTC, ETH, USDT
+  amountCrypto Float // Amount of crypto
+  amountUSD    Float // USD equivalent (for pricing)
+  status       OrderStatus @default(PENDING)
+  orderRef     String?     @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  buyer  User @relation("Buyer", fields: [buyerId], references: [id])
+  seller User @relation("Seller", fields: [sellerId], references: [id])
+
+  @@index([buyerId])
+  @@index([sellerId])
+  @@map("orders")
 }
