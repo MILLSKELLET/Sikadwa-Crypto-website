@@ -1,4 +1,3 @@
-"use client";
 import {
   ArrowDownUp,
   Download,
@@ -6,14 +5,9 @@ import {
   Upload,
 } from "lucide-react";
 import React from "react";
-import { useSession } from "next-auth/react";
 
 const Wallet = () => {
-  const { data: session, status } = useSession();
 
-  console.log("====================================");
-  console.log(session.user);
-  console.log("====================================");
   return (
     <div>
       <div>
