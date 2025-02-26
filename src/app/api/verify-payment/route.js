@@ -4,9 +4,9 @@ import { NextResponse } from "next/server";
 
 export async function POST(req) {
   try {
-    const { userId, oddsId, reference } = await req.json();
+    const { userId, amount, reference } = await req.json();
 
-    if (!userId || !oddsId || !reference) {
+    if (!userId || !amount || !reference) {
       return NextResponse.json(
         { message: "Missing required fields" },
         { status: 400 }
@@ -14,6 +14,20 @@ export async function POST(req) {
     }
 
     const paystackSecretKey = process.env.PAYSTACK_SECRET_KEY;
+    if (!paystackSecretKey) {
+      return NextResponse.json(
+        { message: "Paystack secret key is missing" },
+        { status: 500 }
+      );
+    }
+
+    const parsedAmount = parseFloat(amount);
+    if (isNaN(parsedAmount)) {
+      return NextResponse.json(
+        { message: "Invalid amount format" },
+        { status: 400 }
+      );
+    }
 
     // Verify payment with Paystack
     const response = await axios.get(
@@ -27,27 +41,48 @@ export async function POST(req) {
     const paymentStatus =
       paymentData.status === "success" ? "success" : "failed";
 
-    // Create order in DB
-    const order = await prisma.order.create({
+    // Create transaction in DB
+    const transaction = await prisma.transaction.create({
       data: {
         userId,
-        oddsId,
+        type: "DEPOSIT",
+        amount: parsedAmount,
         status: paymentStatus,
-        paymentReference: reference,
-        transactionId: String(paymentData.id), // ✅ Convert transactionId to String
+        transactionRef: reference,
+        transactionId: String(paymentData.id), // Convert transactionId to String
       },
     });
 
-    console.log("====================================");
-    console.log(order);
-    console.log("====================================");
+    if (transaction) {
+      // Fetch user again to get the latest localWallet balance
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { localWallet: true }, // Fetch only the required field
+      });
+
+      if (!user) {
+        return NextResponse.json(
+          { message: "User not found" },
+          { status: 404 }
+        );
+      }
+
+      await prisma.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          localWallet: (user.localWallet || 0) + parsedAmount, // Ensure valid number
+        },
+      });
+    }
 
     return NextResponse.json(
-      { message: "Order processed", order, paymentStatus },
+      { message: "Transaction processed", transaction, paymentStatus },
       { status: 200 }
     );
   } catch (error) {
-    console.error({ error: "Error verifying payment: "+error });
+    console.error("Error verifying payment:", error);
     return NextResponse.json(
       { message: "Internal server error" },
       { status: 500 }

@@ -60,14 +60,16 @@ model User {
 }
 
 model Transaction {
-  id             String            @id @map("_id") @db.ObjectId
-  userId         String            @db.ObjectId
+  id             String          @id @default(auto()) @map("_id") @db.ObjectId
+  userId         String          @db.ObjectId
   type           TransactionType // DEPOSIT or WITHDRAWAL
-  currency       String            @default("GHS") // Always in GHS
+  currency       String          @default("GHS") // Always in GHS
   amount         Float
-  status         TransactionStatus @default(PENDING)
-  transactionRef String?           @unique // Paystack or internal ref
-  provider       String // "Paystack", "MobileMoney", etc.
+
+  status         String          @default("pending") // pending, success, failed
+  transactionRef String?         @unique // Paystack or internal ref
+  transactionId  String?
+  provider       String?         @default("Paystack") // "Paystack", "MobileMoney", etc.
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
