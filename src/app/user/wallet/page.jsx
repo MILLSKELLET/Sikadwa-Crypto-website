@@ -5,6 +5,7 @@ import DepositForm from "@/components/DepositForm";
 import Modal from "@/components/Modalcomponent";
 import {
   ArrowDownUp,
+  BriefcaseConveyorBelt,
   Download,
   SquareArrowOutUpRight,
   Upload,
@@ -45,8 +46,6 @@ const Wallet = () => {
   if (status === "loading") return <div>Loading...</div>;
   if (status === "unauthenticated") return <div>Not logged in</div>;
 
-  // console.log(user);
-
   return (
     <>
       <div>
@@ -71,9 +70,9 @@ const Wallet = () => {
           <div className="flex flex-col items-center text-xs lg:p-4 p-2 w-full border border-border cursor-pointer">
             <ArrowDownUp /> P2P
           </div>
-          <div className="flex flex-col items-center text-xs lg:p-4 p-2 w-full border border-border cursor-pointer">
+          {/* <div className="flex flex-col items-center text-xs lg:p-4 p-2 w-full border border-border cursor-pointer">
             <SquareArrowOutUpRight /> Transfer
-          </div>
+          </div> */}
           <div
             onClick={() =>
               handleOpenModal(
@@ -83,7 +82,7 @@ const Wallet = () => {
             }
             className="flex flex-col items-center text-xs lg:p-4 p-2 w-full border border-border cursor-pointer"
           >
-            <SquareArrowOutUpRight /> Convert
+            <ArrowDownUp /> Convert
           </div>
         </div>
       </div>
