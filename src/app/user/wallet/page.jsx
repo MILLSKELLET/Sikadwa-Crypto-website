@@ -4,7 +4,12 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import DepositForm from "@/components/DepositForm";
 import Modal from "@/components/Modalcomponent";
-import { ArrowDownUp, Download, SquareArrowOutUpRight, Upload } from "lucide-react";
+import {
+  ArrowDownUp,
+  Download,
+  SquareArrowOutUpRight,
+  Upload,
+} from "lucide-react";
 
 const Wallet = () => {
   const { data: session, status } = useSession();
@@ -38,15 +43,22 @@ const Wallet = () => {
   if (status === "loading") return <div>Loading...</div>;
   if (status === "unauthenticated") return <div>Not logged in</div>;
 
+  // console.log(user);
+
   return (
     <>
       <div>
         <h1>Total Balances</h1>
-        <div>GHS: {user?.localWallet || "Loading..."}</div>
-        <div>USD: {user?.usdWallet || "Loading..."}</div>
+        <div>GHS: {user?.localWallet}</div>
+        <div>USD: {user?.usdWallet}</div>
         <div className="flex gap-4 justify-between py-4">
           <div
-            onClick={() => handleOpenModal(<DepositForm setIsModalOpen={setIsModalOpen} />, "Deposit")}
+            onClick={() =>
+              handleOpenModal(
+                <DepositForm setIsModalOpen={setIsModalOpen} />,
+                "Deposit"
+              )
+            }
             className="flex flex-col items-center text-xs lg:p-4 p-2 w-full border border-border cursor-pointer"
           >
             <Download /> Deposit
@@ -62,7 +74,12 @@ const Wallet = () => {
           </div>
         </div>
       </div>
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={modalTitle} maxWidth="sm">
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title={modalTitle}
+        maxWidth="sm"
+      >
         {ComponentToRender}
       </Modal>
     </>
