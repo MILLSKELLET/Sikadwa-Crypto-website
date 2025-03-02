@@ -108,7 +108,6 @@
 //     return NextResponse.json({ error: "Server error." }, { status: 500 });
 //   }
 // }
-
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { randomUUID } from "crypto";
@@ -143,14 +142,13 @@ export async function POST(req) {
     // Fetch user wallet balances
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { localWallet: true, usdWallet: true },
+      select: { id: true, localWallet: true, usdWallet: true }, // Ensure all fields are selected
     });
 
     if (!user) {
       return NextResponse.json({ error: "User not found." }, { status: 404 });
     }
 
-    // Conversion and balance update logic
     let updatedUser;
     let newOrder;
     let orderData = {
@@ -161,7 +159,6 @@ export async function POST(req) {
     };
 
     if (amountGHS) {
-      // GHS ➡️ USD Conversion
       const convertedUSD = parseFloat((amountGHS / cedisToUsdRate).toFixed(2));
       if (user.localWallet < amountGHS) {
         return NextResponse.json(
@@ -170,26 +167,44 @@ export async function POST(req) {
         );
       }
 
-      // Create order and update balances atomically
+      const newLocalWallet = parseFloat(
+        (user.localWallet - amountGHS).toFixed(2)
+      );
+      const newUsdWallet = parseFloat(
+        (user.usdWallet + convertedUSD).toFixed(2)
+      );
+
+      // 🛠 Ensure valid numbers before update
+      if (Number.isNaN(newLocalWallet) || Number.isNaN(newUsdWallet)) {
+        console.error("Invalid wallet values: ", {
+          newLocalWallet,
+          newUsdWallet,
+        });
+        return NextResponse.json(
+          { error: "Invalid wallet values." },
+          { status: 400 }
+        );
+      }
+
+      // Update balances and create order
       [updatedUser, newOrder] = await prisma.$transaction([
         prisma.user.update({
           where: { id: userId },
           data: {
-            localWallet: { decrement: amountGHS },
-            usdWallet: { increment: convertedUSD },
+            localWallet: newLocalWallet,
+            usdWallet: newUsdWallet,
           },
         }),
         prisma.order.create({
           data: {
             ...orderData,
             currency: "USD",
-            amountCrypto: amountGHS, // Use GHS as placeholder for crypto amount
+            amountCrypto: parseFloat(amountGHS),
             amountUSD: convertedUSD,
           },
         }),
       ]);
     } else if (amountUSD) {
-      // USD ➡️ GHS Conversion
       const convertedGHS = parseFloat((amountUSD * usdToCedisRate).toFixed(2));
       if (user.usdWallet < amountUSD) {
         return NextResponse.json(
@@ -198,27 +213,44 @@ export async function POST(req) {
         );
       }
 
-      // Create order and update balances atomically
+      const newUsdWallet = parseFloat((user.usdWallet - amountUSD).toFixed(2));
+      const newLocalWallet = parseFloat(
+        (user.localWallet + convertedGHS).toFixed(2)
+      );
+
+      // 🛠 Ensure valid numbers before update
+      if (Number.isNaN(newLocalWallet) || Number.isNaN(newUsdWallet)) {
+        console.error("Invalid wallet values: ", {
+          newLocalWallet,
+          newUsdWallet,
+        });
+        return NextResponse.json(
+          { error: "Invalid wallet values." },
+          { status: 400 }
+        );
+      }
+
+      // Update balances and create order
       [updatedUser, newOrder] = await prisma.$transaction([
         prisma.user.update({
           where: { id: userId },
           data: {
-            usdWallet: { decrement: amountUSD },
-            localWallet: { increment: convertedGHS },
+            usdWallet: newUsdWallet,
+            localWallet: newLocalWallet,
           },
         }),
         prisma.order.create({
           data: {
             ...orderData,
             currency: "GHS",
-            amountCrypto: amountUSD, // Use USD as placeholder for crypto amount
+            amountCrypto: parseFloat(amountUSD),
             amountUSD: convertedGHS,
           },
         }),
       ]);
     }
 
-    // Update order status to COMPLETED if everything is successful
+    // Update order status to COMPLETED
     const completedOrder = await prisma.order.update({
       where: { id: newOrder.id },
       data: { status: "COMPLETED" },
@@ -228,12 +260,12 @@ export async function POST(req) {
       message: "Conversion successful.",
       order: completedOrder,
       updatedBalances: {
-        localWallet: parseFloat(updatedUser.localWallet.toFixed(2)),
-        usdWallet: parseFloat(updatedUser.usdWallet.toFixed(2)),
+        localWallet: updatedUser.localWallet,
+        usdWallet: updatedUser.usdWallet,
       },
     });
   } catch (error) {
-    console.error("Error in conversion:", error.message);
+    console.error("Error in conversion:", error);
     return NextResponse.json({ error: "Server error." }, { status: 500 });
   }
 }
