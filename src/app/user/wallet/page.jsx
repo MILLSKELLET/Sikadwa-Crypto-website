@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import ConversionForm from "@/components/ConversionForm";
 import DepositForm from "@/components/DepositForm";
 import Modal from "@/components/Modalcomponent";
 import {
@@ -10,11 +9,10 @@ import {
   SquareArrowOutUpRight,
   Upload,
 } from "lucide-react";
-import ConversionForm from "@/components/ConversionForm";
-import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
 
 const Wallet = () => {
-  const router = useRouter();
 
   const { data: session, status } = useSession();
   const [user, setUser] = useState(null);
@@ -36,7 +34,7 @@ const Wallet = () => {
       };
       fetchUser();
     }
-  }, [session, router]);
+  }, [session, isModalOpen]);
 
   const handleOpenModal = (Component, title) => {
     setModalTitle(title);

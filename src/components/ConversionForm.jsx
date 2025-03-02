@@ -2,56 +2,72 @@
 
 // import { useState, useEffect } from "react";
 
-// const ConversionForm = ({ setIsModalOpen }) => {
-//   const [exchangeRate, setExchangeRate] = useState(null);
-//   const [amountGHS, setAmountGHS] = useState("");
-//   const [amountUSD, setAmountUSD] = useState("");
+// export default function ConvertPage({ user, setIsModalOpen }) {
+//   const [exchangeRate, setExchangeRate] = useState(user?.usdToCedisRate || 0);
+//   const [inputType, setInputType] = useState("GHS"); // Toggle between GHS and USD
+//   const [amount, setAmount] = useState("");
 //   const [preview, setPreview] = useState(null);
+//   const [loading, setLoading] = useState(false);
+//   const [error, setError] = useState("");
 
-//   // Fetch exchange rate on mount
-//   useEffect(() => {
-//     const fetchRate = async () => {
-//       const res = await fetch("/api/wallet/rate");
-//       const data = await res.json();
-//       if (data.exchangeRate) setExchangeRate(data.exchangeRate);
-//     };
-//     fetchRate();
-//   }, []);
-
+//   // Handle preview conversion based on input type
 //   const handlePreview = () => {
-//     if (!exchangeRate) return;
+//     if (!exchangeRate || !amount) return;
 
-//     // Calculate preview
-//     let ghsToUsd = null;
-//     let usdToGhs = null;
+//     setLoading(true);
+//     setError("");
 
-//     if (amountGHS) {
-//       ghsToUsd = parseFloat((amountGHS / exchangeRate).toFixed(2));
+//     const amountFloat = parseFloat(amount);
+//     let previewData = null;
+
+//     if (inputType === "GHS") {
+//       if (user.localWallet < amountFloat) {
+//         setError("Insufficient GHS balance.");
+//         setLoading(false);
+//         return;
+//       }
+//       previewData = {
+//         ghsToUsd: parseFloat((amountFloat / exchangeRate).toFixed(2)),
+//       };
+//     } else {
+//       if (user.usdWallet < amountFloat) {
+//         setError("Insufficient USD balance.");
+//         setLoading(false);
+//         return;
+//       }
+//       previewData = {
+//         usdToGhs: parseFloat((amountFloat * exchangeRate).toFixed(2)),
+//       };
 //     }
-//     if (amountUSD) {
-//       usdToGhs = parseFloat((amountUSD * exchangeRate).toFixed(2));
-//     }
 
-//     setPreview({ ghsToUsd, usdToGhs });
+//     setPreview(previewData);
+//     setLoading(false);
 //   };
 
+//   // Handle actual conversion transaction
 //   const handleConvert = async () => {
 //     try {
+//       setLoading(true);
 //       const res = await fetch("/api/wallet/convert", {
 //         method: "POST",
 //         headers: { "Content-Type": "application/json" },
 //         body: JSON.stringify({
-//           userId: "user_object_id_here", // Replace with dynamic user ID
-//           amountGHS: amountGHS ? parseFloat(amountGHS) : null,
-//           amountUSD: amountUSD ? parseFloat(amountUSD) : null,
+//           userId: user.id,
+//           amountGHS: inputType === "GHS" ? parseFloat(amount) : null,
+//           amountUSD: inputType === "USD" ? parseFloat(amount) : null,
 //         }),
 //       });
 //       const data = await res.json();
 //       if (data.error) throw new Error(data.error);
 //       alert("Conversion successful!");
+//       setAmount("");
+//       setPreview(null);
+//       setLoading(false);
+//       setIsModalOpen(false);
 //     } catch (error) {
 //       console.error("Conversion error:", error.message);
 //       alert("Conversion failed!");
+//       setLoading(false);
 //     }
 //   };
 
@@ -62,58 +78,68 @@
 //         Exchange Rate:{" "}
 //         {exchangeRate ? `1 USD = ${exchangeRate} GHS` : "Loading..."}
 //       </p>
+//       <p>
+//         Your Balance: {user.localWallet} GHS | {user.usdWallet} USD
+//       </p>
 
-//       <div>
-//         <label>Amount in GHS:</label>
-//         <input
-//           type="number"
-//           value={amountGHS}
+//       <div style={{ margin: "10px 0" }}>
+//         <label>Choose Input Currency:</label>
+//         <select
+//           value={inputType}
 //           onChange={(e) => {
-//             setAmountGHS(e.target.value);
-//             setAmountUSD("");
+//             setInputType(e.target.value);
+//             setAmount("");
 //             setPreview(null);
+//             setError("");
 //           }}
-//           placeholder="Enter amount in GHS"
-//         />
+//         >
+//           <option value="GHS">GHS</option>
+//           <option value="USD">USD</option>
+//         </select>
 //       </div>
 
 //       <div>
-//         <label>Amount in USD:</label>
+//         <label>Amount in {inputType}:</label>
 //         <input
 //           type="number"
-//           value={amountUSD}
+//           value={amount}
 //           onChange={(e) => {
-//             setAmountUSD(e.target.value);
-//             setAmountGHS("");
+//             setAmount(e.target.value);
 //             setPreview(null);
+//             setError("");
 //           }}
-//           placeholder="Enter amount in USD"
+//           placeholder={`Enter amount in ${inputType}`}
 //         />
 //       </div>
 
-//       <button onClick={handlePreview}>Preview Conversion</button>
+//       <button onClick={handlePreview} disabled={loading}>
+//         {loading ? "Checking Balance..." : "Preview Conversion"}
+//       </button>
+
+//       {error && <p style={{ color: "red" }}>{error}</p>}
 
 //       {preview && (
 //         <div style={{ marginTop: "20px" }}>
 //           <h3>Preview</h3>
-//           <p>GHS to USD: {preview.ghsToUsd || "N/A"}</p>
-//           <p>USD to GHS: {preview.usdToGhs || "N/A"}</p>
-//           <button onClick={handleConvert}>Confirm Conversion</button>
+//           {inputType === "GHS" ? (
+//             <p>GHS to USD: {preview.ghsToUsd}</p>
+//           ) : (
+//             <p>USD to GHS: {preview.usdToGhs}</p>
+//           )}
+//           <button onClick={handleConvert} disabled={loading}>
+//             {loading ? "Converting..." : "Confirm Conversion"}
+//           </button>
 //         </div>
 //       )}
 //     </div>
 //   );
-// };
-
-// export default ConversionForm;
-
-
+// }
 
 "use client";
 
 import { useState, useEffect } from "react";
 
-export default function ConvertPage({ user }) {
+export default function ConvertPage({ user, setIsModalOpen }) {
   const [exchangeRate, setExchangeRate] = useState(user?.usdToCedisRate || 0);
   const [inputType, setInputType] = useState("GHS"); // Toggle between GHS and USD
   const [amount, setAmount] = useState("");
@@ -138,7 +164,7 @@ export default function ConvertPage({ user }) {
         return;
       }
       previewData = {
-        ghsToUsd: parseFloat((amountFloat / exchangeRate).toFixed(2))
+        ghsToUsd: parseFloat((amountFloat / exchangeRate).toFixed(2)),
       };
     } else {
       if (user.usdWallet < amountFloat) {
@@ -147,7 +173,7 @@ export default function ConvertPage({ user }) {
         return;
       }
       previewData = {
-        usdToGhs: parseFloat((amountFloat * exchangeRate).toFixed(2))
+        usdToGhs: parseFloat((amountFloat * exchangeRate).toFixed(2)),
       };
     }
 
@@ -165,8 +191,8 @@ export default function ConvertPage({ user }) {
         body: JSON.stringify({
           userId: user.id,
           amountGHS: inputType === "GHS" ? parseFloat(amount) : null,
-          amountUSD: inputType === "USD" ? parseFloat(amount) : null
-        })
+          amountUSD: inputType === "USD" ? parseFloat(amount) : null,
+        }),
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
@@ -174,6 +200,7 @@ export default function ConvertPage({ user }) {
       setAmount("");
       setPreview(null);
       setLoading(false);
+      setIsModalOpen(false);
     } catch (error) {
       console.error("Conversion error:", error.message);
       alert("Conversion failed!");
@@ -184,8 +211,17 @@ export default function ConvertPage({ user }) {
   return (
     <div style={{ padding: "20px" }}>
       <h2>Currency Converter</h2>
-      <p>Exchange Rate: {exchangeRate ? `1 USD = ${exchangeRate} GHS` : "Loading..."}</p>
-      <p>Your Balance: {user.localWallet} GHS | {user.usdWallet} USD</p>
+      <p>
+        Exchange Rate:{" "}
+        {exchangeRate
+          ? inputType === "GHS"
+            ? `1 GHS = ${(1 / exchangeRate).toFixed(4)} USD`
+            : `1 USD = ${exchangeRate} GHS`
+          : "Loading..."}
+      </p>
+      <p>
+        Your Balance: {user.localWallet} GHS | {user.usdWallet} USD
+      </p>
 
       <div style={{ margin: "10px 0" }}>
         <label>Choose Input Currency:</label>
