@@ -40,6 +40,8 @@ model User {
   phone    String?
   role     String  @default("user")
 
+  usdToCedisRate Float @default(0) // GHS wallet
+
   // Wallet balances
   localWallet Float @default(0) // GHS wallet
   usdWallet   Float @default(0) // USD equivalent
@@ -60,16 +62,16 @@ model User {
 }
 
 model Transaction {
-  id             String          @id @default(auto()) @map("_id") @db.ObjectId
-  userId         String          @db.ObjectId
-  type           TransactionType // DEPOSIT or WITHDRAWAL
-  currency       String          @default("GHS") // Always in GHS
-  amount         Float
+  id       String          @id @default(auto()) @map("_id") @db.ObjectId
+  userId   String          @db.ObjectId
+  type     TransactionType // DEPOSIT or WITHDRAWAL
+  currency String          @default("GHS") // Always in GHS
+  amount   Float
 
-  status         String          @default("pending") // pending, success, failed
-  transactionRef String?         @unique // Paystack or internal ref
+  status         String  @default("pending") // pending, success, failed
+  transactionRef String? @unique // Paystack or internal ref
   transactionId  String?
-  provider       String?         @default("Paystack") // "Paystack", "MobileMoney", etc.
+  provider       String? @default("Paystack") // "Paystack", "MobileMoney", etc.
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

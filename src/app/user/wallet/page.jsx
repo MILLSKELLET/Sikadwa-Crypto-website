@@ -10,8 +10,12 @@ import {
   SquareArrowOutUpRight,
   Upload,
 } from "lucide-react";
+import ConversionForm from "@/components/ConversionForm";
+import { useRouter } from "next/navigation";
 
 const Wallet = () => {
+  const router = useRouter();
+
   const { data: session, status } = useSession();
   const [user, setUser] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -32,7 +36,7 @@ const Wallet = () => {
       };
       fetchUser();
     }
-  }, [session]);
+  }, [session, router]);
 
   const handleOpenModal = (Component, title) => {
     setModalTitle(title);
@@ -71,6 +75,17 @@ const Wallet = () => {
           </div>
           <div className="flex flex-col items-center text-xs lg:p-4 p-2 w-full border border-border cursor-pointer">
             <SquareArrowOutUpRight /> Transfer
+          </div>
+          <div
+            onClick={() =>
+              handleOpenModal(
+                <ConversionForm user={user} setIsModalOpen={setIsModalOpen} />,
+                "Conversion"
+              )
+            }
+            className="flex flex-col items-center text-xs lg:p-4 p-2 w-full border border-border cursor-pointer"
+          >
+            <SquareArrowOutUpRight /> Convert
           </div>
         </div>
       </div>

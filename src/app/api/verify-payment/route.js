@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import axios from "axios";
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
 export async function POST(req) {
@@ -76,6 +77,8 @@ export async function POST(req) {
         },
       });
     }
+
+    revalidatePath("/user/wallet"); // Revalidate user data
 
     return NextResponse.json(
       { message: "Transaction processed", transaction, paymentStatus },

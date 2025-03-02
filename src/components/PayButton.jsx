@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
 
 // Dynamically import PaystackButton with SSR disabled
 const PaystackButton = dynamic(
@@ -10,6 +11,7 @@ const PaystackButton = dynamic(
 );
 
 export default function PayButton({ user, amount, setIsModalOpen }) {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [paystackKey, setPaystackKey] = useState("");
 
@@ -47,6 +49,7 @@ export default function PayButton({ user, amount, setIsModalOpen }) {
       if (response.data.paymentStatus === "success") {
         alert("Payment successful! Your deposit is confirmed.");
         setIsModalOpen(false);
+        router.refresh(); // Refresh the page to update the wallet balances
       } else {
         alert("Payment pending. Please check your dashboard.");
       }
