@@ -1,6 +1,14 @@
 "use client";
 import React from "react";
-import { Home, Search, Heart, User } from "lucide-react";
+import {
+  Home,
+  Search,
+  Heart,
+  User,
+  WalletMinimal,
+  ChartCandlestick,
+  ArrowRightLeft,
+} from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -9,9 +17,14 @@ const BottomNavigation = () => {
   const pathname = usePathname();
 
   const navItems = [
-    { id: "Market", label: "Market", icon: Search, link: "/market" },
-    { id: "trade", label: "Trade", icon: Heart, link: "/user/trade" },
-    { id: "wallet", label: "Wallet", icon: Heart, link: "/user/wallet" },
+    { id: "Market", label: "Market", icon: ChartCandlestick, link: "/market" },
+    { id: "trade", label: "Trade", icon: ArrowRightLeft, link: "/user/trade" },
+    {
+      id: "wallet",
+      label: "Wallet",
+      icon: WalletMinimal,
+      link: "/user/wallet",
+    },
     { id: "profile", label: "Profile", icon: User, link: "/user/profile" },
   ];
 
