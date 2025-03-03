@@ -12,6 +12,7 @@ const SettingsPage = () => {
     email: "",
     phone: "",
   };
+
   const [formData, setFormData] = useState(initial);
 
   const [passwordData, setPasswordData] = useState({
@@ -26,15 +27,26 @@ const SettingsPage = () => {
   const [isPersonalLoading, setIsPersonalLoading] = useState(false); // ✅ Personal Info Loading
   const [isPasswordLoading, setIsPasswordLoading] = useState(false); // ✅ Password Change Loading
 
-  // ✅ Populate form data when session is loaded
+  // ✅ fetch form data when session is loaded
   useEffect(() => {
-    if (session?.user) {
-      setFormData({
-        name: session.user.name || "",
-        email: session.user.email || "",
-        phone: session.user.phone || "",
-      });
-    }
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("/api/user/");
+        const data = await res.json();
+        if (data) {
+          setFormData({
+            name: data.name || "",
+            email: data.email || "",
+            phone: data.phone || "",
+          });
+        }
+        if (data.error) throw new Error(data.error);
+      } catch (err) {
+        console.error("Failed to fetch user :", err.message);
+      }
+    };
+
+    fetchUser();
   }, [session]);
 
   // ✅ Handle Personal Info Update
