@@ -16,7 +16,9 @@ const geistMono = Geist_Mono({
 
 export const metadata = {
   title: " crypto P@P",
-  description: "Ready ",
+  description: "your one stop shop for all things crypto",
+  image: "/images/logo.png", // Twitter Card Image
+  url: "https://crypto-pap.vercel.app",
 };
 
 export default function RootLayout({ children }) {

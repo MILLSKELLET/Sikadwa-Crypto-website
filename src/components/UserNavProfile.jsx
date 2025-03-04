@@ -47,10 +47,8 @@ const UserNavProfile = () => {
         </DropdownTrigger>
         <DropdownMenu aria-label="Profile Actions" variant="flat">
           <DropdownItem key="profile" className="h-14 gap-2">
-            <p className="font-semibold">Signed in as</p>
             <p className="font-semibold">
-              {" "}
-              {user?.name?.substring(0, 10) + "xxxx"}
+              {user?.name}
             </p>
             <p className="font-semibold"> {user?.email}</p>
           </DropdownItem>
@@ -64,7 +62,7 @@ const UserNavProfile = () => {
             profile Settings
           </DropdownItem>
 
-          <DropdownItem onClick={() => signOut()} key="logout" color="danger">
+          <DropdownItem onPress={() => signOut()} key="logout" color="danger">
             Log Out
           </DropdownItem>
         </DropdownMenu>

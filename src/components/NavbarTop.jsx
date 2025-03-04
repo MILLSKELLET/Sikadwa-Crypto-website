@@ -21,34 +21,30 @@ export default function Navbar() {
     }
   };
 
-  const menuItems = [
-    { name: "Home", link: "/" },
-  ];
 
   const menuList = (
     <>
-      {menuItems.map((item, index) => (
-        <Link
-          key={`${item}-${index}`}
-          className="hover:text-gray-400 capitalize font-semibold"
-          href={item.link}
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-        >
-          {item.name}
-        </Link>
-      ))}
+      <Link
+        className="hover:text-gray-400 capitalize font-semibold"
+        href={"/"}
+        onClick={() => setIsMenuOpen(!isMenuOpen)}
+      >
+        Home
+      </Link>
       {!session ? (
         <>
           <Button
             onPress={() => setIsMenuOpen(!isMenuOpen)}
             color="secondary"
             variant="ghost"
+            size="sm"
             as={Link}
             href="/login"
           >
             Login
           </Button>
           <Button
+            size="sm"
             onPress={() => setIsMenuOpen(!isMenuOpen)}
             color="secondary"
             as={Link}
@@ -71,7 +67,7 @@ export default function Navbar() {
       <header
         className={`top-0 fixed z-50 w-full bg-foreground primary text-copy `}
       >
-        <div className="container mx-auto flex items-center justify-between p-4">
+        <div className="container mx-auto flex items-center justify-between p-2">
           {/* Logo */}
           <div className="lg:text-2xl text-base font-bold">
             <a href="/">Crypto P@P</a>
