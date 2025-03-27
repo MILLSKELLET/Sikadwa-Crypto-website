@@ -4,11 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
     "vercel-build": "prisma generate && next build",
-    "postinstall-comment": "npx prisma generate"
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@heroui/react": "^2.6.14",
