@@ -17,7 +17,7 @@ const Layout = ({ children }) => {
   ];
   return (
     <div className="container mx-auto flex min-h-screen gap-8 p-4 pt-8">
-      <div className="flex min-w-[5rem] lg:min-w-[10rem] flex-col gap-4 rounded-xl bg-foreground p-4 shadow-lg">
+      {/* <div className="flex min-w-[5rem] lg:min-w-[10rem] flex-col gap-4 rounded-xl bg-foreground p-4 shadow-lg">
         <h2 className="text-xl font-bold">Sidebar</h2>
         <nav className="flex flex-col gap-2">
           {links.map((link, index) => (
@@ -34,7 +34,7 @@ const Layout = ({ children }) => {
             </Link>
           ))}
         </nav>
-      </div>
+      </div> */}
       <div className="w-full">{children}</div>
     </div>
   );

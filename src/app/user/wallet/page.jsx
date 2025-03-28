@@ -3,6 +3,7 @@
 import ConversionForm from "@/components/ConversionForm";
 import DepositForm from "@/components/DepositForm";
 import Modal from "@/components/Modalcomponent";
+import { Tab, Tabs } from "@heroui/react";
 import {
   ArrowDownUp,
   BriefcaseConveyorBelt,
@@ -14,7 +15,6 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
 const Wallet = () => {
-
   const { data: session, status } = useSession();
   const [user, setUser] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -49,10 +49,10 @@ const Wallet = () => {
   return (
     <>
       <div>
-        <h1>Total Balances</h1>
+        <h1 className="text-sm font-bold uppercase">Total Balance</h1>
         <div>GHS: {user?.localWallet}</div>
         <div>USD: {user?.usdWallet}</div>
-        <div className="flex gap-4 justify-between py-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 justify-between py-4">
           <div
             onClick={() =>
               handleOpenModal(
@@ -70,9 +70,6 @@ const Wallet = () => {
           <div className="flex flex-col items-center text-xs lg:p-4 p-2 w-full border border-border cursor-pointer">
             <ArrowDownUp /> P2P
           </div>
-          {/* <div className="flex flex-col items-center text-xs lg:p-4 p-2 w-full border border-border cursor-pointer">
-            <SquareArrowOutUpRight /> Transfer
-          </div> */}
           <div
             onClick={() =>
               handleOpenModal(
@@ -85,6 +82,18 @@ const Wallet = () => {
             <ArrowDownUp /> Convert
           </div>
         </div>
+        <Tabs fullWidth aria-label="Options">
+          <Tab key="transaction" title="Transactions History">
+            <div className="flex flex-col items-center text-xs lg:p-4 p-2 w-full border border-border cursor-pointer">
+              <BriefcaseConveyorBelt /> Transaction History
+            </div>
+          </Tab>
+          <Tab key="Orders" title="Orders History">
+            <div className="flex flex-col items-center text-xs lg:p-4 p-2 w-full border border-border cursor-pointer">
+              <SquareArrowOutUpRight /> Order History
+            </div>
+          </Tab>
+        </Tabs>
       </div>
       <Modal
         isOpen={isModalOpen}
