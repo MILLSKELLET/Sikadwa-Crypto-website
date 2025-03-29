@@ -51,6 +51,7 @@ model User {
 
   // Transactions: Deposits to the platform
   transactions Transaction[]
+  gigs         Gig[]
 
   // Orders: Buying & Selling crypto
   buyerOrders  Order[] @relation("Buyer")
@@ -104,3 +105,29 @@ model Order {
   @@index([sellerId])
   @@map("orders")
 }
+enum GigType {
+  BUY
+  SELL
+}
+
+model Gig {
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String   @db.ObjectId
+  title             String
+  description       String
+  currency          Currency // BTC, ETH, USDT
+  price            Float // Price per unit of crypto
+  quantityAvailable Float // Total quantity available (e.g., 2 BTC)
+  type              GigType // "BUY" or "SELL"
+  status            String @default("active") // active, completed, cancelled
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  User User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@map("gigs")
+}
+
+

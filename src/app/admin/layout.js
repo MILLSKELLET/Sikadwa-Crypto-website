@@ -13,7 +13,6 @@ const Layout = ({ children }) => {
     { href: "/admin/orders", label: "Orders" },
     { href: "/admin/users", label: "Users" },
     { href: "/admin/settings", label: "Settings" },
-   
   ];
   return (
     <div className="container mx-auto flex min-h-screen gap-8 p-4 pt-8">
