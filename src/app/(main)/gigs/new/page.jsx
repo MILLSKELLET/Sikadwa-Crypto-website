@@ -9,6 +9,7 @@ export default function CreateGigPage() {
   const [quantityAvailable, setQuantityAvailable] = useState("");
   const [type, setType] = useState("SELL"); // Default to SELL
 
+  console.log(type);
   async function submitGig(e) {
     e.preventDefault();
     const response = await fetch("/api/gigs", {

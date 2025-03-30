@@ -34,15 +34,16 @@ const SettingsPage = () => {
         const res = await fetch("/api/user/");
         const data = await res.json();
         if (data) {
+          console.log(data);
           setFormData({
             name: data.name || "",
             email: data.email || "",
             phone: data.phone || "",
           });
         }
-        if (data.error) throw new Error(data.error);
-      } catch (err) {
-        console.error("Failed to fetch user :", err.message);
+        if (data?.error) throw new Error(data.error);
+      } catch (error) {
+        console.error("Failed to fetch user :", error);
       }
     };
 

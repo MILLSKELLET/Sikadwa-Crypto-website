@@ -42,6 +42,7 @@ export const authOptions = {
           id: user.id,
           name: user.name,
           email: user.email,
+          phone: user.phone,
           role: user.role,
         };
       },
@@ -55,12 +56,14 @@ export const authOptions = {
       if (user) {
         token.role = user.role;
         token.id = user.id; // Store user ID in JWT
+        token.phone = user.phone;
       }
       return token;
     },
     async session({ session, token }) {
       session.user.role = token.role;
       session.user.id = token.id; // Attach user ID to the session
+      session.user.phone = token.phone;
 
       return session;
     },
