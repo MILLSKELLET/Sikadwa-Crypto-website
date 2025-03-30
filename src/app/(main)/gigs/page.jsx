@@ -143,7 +143,6 @@
 //   );
 // }
 
-
 "use client";
 import { useState, useEffect } from "react";
 
@@ -183,11 +182,11 @@ export default function GigsPage() {
 
   async function confirmGigAction() {
     if (!selectedGig) return;
-    
+
     const gig = selectedGig;
     setShowConfirmation(false);
     setPurchasing(true);
-    
+
     try {
       // Default to buying/selling 1 unit if not specified
       const amountCrypto = 1;
@@ -209,11 +208,16 @@ export default function GigsPage() {
       });
 
       const result = await response.json();
-      console.log(`${gig.type === "SELL" ? "Sell" : "Purchase"} response:`, result);
+      console.log(
+        `${gig.type === "SELL" ? "Sell" : "Purchase"} response:`,
+        result
+      );
 
       if (response.ok) {
         // Success message
-        alert(`Gig ${gig.type === "SELL" ? "sold" : "purchased"} successfully!`);
+        alert(
+          `Gig ${gig.type === "SELL" ? "sold" : "purchased"} successfully!`
+        );
 
         // Refresh gigs list
         const updatedResponse = await fetch("/api/gigs");
@@ -221,10 +225,16 @@ export default function GigsPage() {
         setGigs(updatedData);
       } else {
         // Handle error from API response
-        throw new Error(result.error || `Failed to ${gig.type === "SELL" ? "sell" : "purchase"} gig`);
+        throw new Error(
+          result.error ||
+            `Failed to ${gig.type === "SELL" ? "sell" : "purchase"} gig`
+        );
       }
     } catch (error) {
-      console.error(`${gig.type === "SELL" ? "Sell" : "Purchase"} error:`, error);
+      console.error(
+        `${gig.type === "SELL" ? "Sell" : "Purchase"} error:`,
+        error
+      );
       alert(`Error: ${error.message}`);
     } finally {
       setPurchasing(false);
@@ -270,7 +280,8 @@ export default function GigsPage() {
               <div className="mt-4 flex justify-between items-center">
                 <p className="font-bold text-lg">{gig.price} USD per unit</p>
                 <p className="text-sm text-gray-500">
-                  {gig.quantityAvailable || 0} {gig.currency} Available
+                  {gig.quantityAvailable || 0} {gig.currency}{" "}
+                  {gig.type === "SELL" ? "Needed" : "Available"}
                 </p>
               </div>
 
@@ -311,9 +322,13 @@ export default function GigsPage() {
       {showConfirmation && selectedGig && (
         <div className="fixed inset-0 bg-foreground transparent bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-background p-6 rounded-lg shadow-lg max-w-md w-full">
-            <h2 className="text-xl font-bold mb-4">Confirm {selectedGig.type === "SELL" ? "Sell" : "Purchase"}</h2>
+            <h2 className="text-xl font-bold mb-4">
+              Confirm {selectedGig.type === "SELL" ? "Sell" : "Purchase"}
+            </h2>
             <p className="mb-6">
-              Are you sure you want to {selectedGig.type === "SELL" ? "sell" : "buy"} 1 {selectedGig.currency} for {selectedGig.price} USD?
+              Are you sure you want to{" "}
+              {selectedGig.type === "SELL" ? "sell" : "buy"} 1{" "}
+              {selectedGig.currency} for {selectedGig.price} USD?
             </p>
             <div className="flex justify-end space-x-4">
               <button
