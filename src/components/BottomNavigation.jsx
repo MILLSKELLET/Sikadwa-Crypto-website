@@ -18,7 +18,7 @@ const BottomNavigation = () => {
 
   const navItems = [
     { id: "Market", label: "Market", icon: ChartCandlestick, link: "/market" },
-    { id: "trade", label: "Trade", icon: ArrowRightLeft, link: "/user/trade" },
+    { id: "gigs", label: "Trade", icon: ArrowRightLeft, link: "/gigs" },
     {
       id: "wallet",
       label: "Wallet",

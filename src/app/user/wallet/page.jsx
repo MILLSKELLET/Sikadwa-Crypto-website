@@ -12,6 +12,7 @@ import {
   Upload,
 } from "lucide-react";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 const Wallet = () => {
@@ -52,7 +53,7 @@ const Wallet = () => {
         <h1 className="text-sm font-bold uppercase">Total Balance</h1>
         <div>GHS: {user?.localWallet}</div>
         <div>USD: {user?.usdWallet}</div>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 justify-between py-4">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 justify-between py-4">
           <div
             onClick={() =>
               handleOpenModal(
@@ -64,12 +65,12 @@ const Wallet = () => {
           >
             <Download /> Deposit
           </div>
-          <div className="flex flex-col items-center text-xs lg:p-4 p-2 w-full border border-border cursor-pointer">
+          {/* <div className="flex flex-col items-center text-xs lg:p-4 p-2 w-full border border-border cursor-pointer">
             <Upload /> Withdraw
-          </div>
-          <div className="flex flex-col items-center text-xs lg:p-4 p-2 w-full border border-border cursor-pointer">
+          </div> */}
+          <Link href="/gigs" className="flex flex-col items-center text-xs lg:p-4 p-2 w-full border border-border cursor-pointer">
             <ArrowDownUp /> P2P
-          </div>
+          </Link>
           <div
             onClick={() =>
               handleOpenModal(

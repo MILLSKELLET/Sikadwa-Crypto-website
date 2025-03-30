@@ -1,7 +1,9 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function CreateGigPage() {
+  const router = useRouter();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [currency, setCurrency] = useState("BTC");
@@ -27,6 +29,7 @@ export default function CreateGigPage() {
 
     if (response.ok) {
       alert("Gig created successfully!");
+      router.push("/gigs");
     } else {
       alert("Failed to create gig");
     }
