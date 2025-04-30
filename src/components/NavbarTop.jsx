@@ -70,7 +70,7 @@ export default function Navbar() {
         <div className="container mx-auto flex items-center justify-between p-2">
           {/* Logo */}
           <div className="lg:text-2xl text-base font-bold">
-            <a href="/">Crypto P@P</a>
+            <a href="/">Sikadwa</a>
           </div>
 
           {/* Desktop Menu */}
