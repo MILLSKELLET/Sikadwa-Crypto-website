@@ -356,8 +356,8 @@ export default function GigsPage() {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Available Gigs</h1>
-        <Link className="bg-primary p-2 rounded-lg" href="/gigs/new">New Gig</Link>
+        <h1 className="text-2xl font-bold">Available Trade</h1>
+        <Link className="bg-primary p-2 rounded-lg" href="/gigs/new">New Trade</Link>
       </div>
 
       {/* Filter Buttons */}
@@ -395,7 +395,7 @@ export default function GigsPage() {
       </div>
 
       {filteredGigs.length === 0 ? (
-        <p>No {activeFilter !== "ALL" ? activeFilter.toLowerCase() : ""} gigs available at this time.</p>
+        <p>No {activeFilter !== "ALL" ? activeFilter.toLowerCase() : ""} Trade available at this time.</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredGigs.map((gig) => (
